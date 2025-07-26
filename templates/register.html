@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .auth-container {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  .auth-header h2 {
+    font-size: 1.8rem;
+    color: #78B9B5;
+    font-weight: 700;
+  }
+
+  .auth-header p {
+    color: #6c757d;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .auth-btn {
+    background-color: #78B9B5;
+    border: none;
+    transition: all 0.3s ease;
+  }
+  .auth-btn:hover {
+    background-color: #5aa29d;
+  }
+
+  .auth-footer {
+    font-size: 0.9rem;
+    margin-top: 1rem;
+  }
+
+  .auth-footer a {
+    color: #78B9B5;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .auth-footer a:hover {
+    text-decoration: underline;
+  }
+
+  .input-group-text {
+    background-color: #78B9B5;
+    color: white;
+  }
+</style>
+
+<div class="container">
+  <div class="auth-header text-center mb-4">
+    <h2><i class="bi bi-person-plus me-2"></i>Register</h2>
+    <p>Create your account to get started.</p>
+  </div>
+
+  <div class="auth-container">
+    <form method="post" class="needs-validation" novalidate>
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="{{ field.id_for_label }}">
+            {{ field.label }}
+          </label>
+          <div class="input-group">
+            <span class="input-group-text">
+              {% if 'username' in field.name %}
+                <i class="bi bi-person-fill"></i>
+              {% elif 'email' in field.name %}
+                <i class="bi bi-envelope-fill"></i>
+              {% elif 'password' in field.name %}
+                <i class="bi bi-lock-fill"></i>
+              {% else %}
+                <i class="bi bi-pencil-fill"></i>
+              {% endif %}
+            </span>
+            {{ field }}
+          </div>
+          {% for error in field.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+
+      <button type="submit" class="btn auth-btn w-100 text-white fw-semibold">
+        <i class="bi bi-check-circle me-1"></i> Register
+      </button>
+    </form>
+  </div>
+
+  <div class="auth-footer text-center">
+    Already have an account?
+    <a href="{% url 'login' %}">Login here</a>
+  </div>
+</div>
+
+{% endblock %}

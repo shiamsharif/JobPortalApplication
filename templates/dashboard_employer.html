@@ -1,0 +1,871 @@
+{% extends "base.html" %}
+{% block title %}Employer Dashboard - Job Portal{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Dashboard Header */
+  .dashboard-header {
+    background: linear-gradient(135deg, #0F828C 0%, #0A6B73 100%);
+    color: white;
+    padding: 3rem 0;
+    margin: -2rem -15px 3rem -15px;
+    border-radius: 0 0 40px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></svg>');
+    opacity: 0.3;
+  }
+
+  .welcome-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .welcome-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .welcome-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    font-weight: 300;
+  }
+
+  .company-avatar {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Quick Actions */
+  .quick-actions {
+    margin-bottom: 3rem;
+  }
+
+  .action-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .action-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0F828C, #0A6B73);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+  }
+
+  .action-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .action-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(15, 130, 140, 0.15);
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  .action-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, #0F828C, #0A6B73);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.8rem;
+    transition: all 0.4s ease;
+    box-shadow: 0 8px 25px rgba(15, 130, 140, 0.3);
+  }
+
+  .action-card:hover .action-icon {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 15px 35px rgba(15, 130, 140, 0.4);
+  }
+
+  .action-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1A202C;
+    margin-bottom: 1rem;
+  }
+
+  .action-description {
+    color: #4A5568;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .action-btn {
+    background: linear-gradient(135deg, #0F828C, #0A6B73);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 0.8rem 1.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(15, 130, 140, 0.4);
+    color: white;
+    text-decoration: none;
+  }
+
+  .action-btn.btn-success {
+    background: linear-gradient(135deg, #38A169, #2F855A);
+  }
+
+  .action-btn.btn-success:hover {
+    box-shadow: 0 8px 25px rgba(56, 161, 105, 0.4);
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .stat-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient);
+    border-radius: 20px 20px 0 0;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .stat-card.active-jobs { --gradient: linear-gradient(90deg, #0F828C, #0A6B73); }
+  .stat-card.total-applicants { --gradient: linear-gradient(90deg, #3182CE, #2C5282); }
+  .stat-card.interviews { --gradient: linear-gradient(90deg, #38A169, #2F855A); }
+  .stat-card.hired { --gradient: linear-gradient(90deg, #9F7AEA, #805AD5); }
+
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1A202C;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .stat-label {
+    color: #4A5568;
+    font-weight: 500;
+    font-size: 1rem;
+  }
+
+  .stat-icon {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+    background: rgba(15, 130, 140, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0F828C;
+    font-size: 1.2rem;
+  }
+
+  /* Jobs Management */
+  .jobs-section {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1A202C;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .section-title-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .job-card {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .job-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #0F828C, #0A6B73);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+  }
+
+  .job-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .job-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(15, 130, 140, 0.15);
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  .job-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .job-status {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .job-status.active {
+    background: rgba(56, 161, 105, 0.15);
+    color: #38A169;
+  }
+
+  .job-status.draft {
+    background: rgba(214, 158, 46, 0.15);
+    color: #D69E2E;
+  }
+
+  .job-status.closed {
+    background: rgba(113, 128, 150, 0.15);
+    color: #718096;
+  }
+
+  .job-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1A202C;
+    margin-bottom: 0.5rem;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .job-title:hover {
+    color: #0F828C;
+    text-decoration: none;
+  }
+
+  .job-company {
+    color: #4A5568;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .job-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid #E2E8F0;
+  }
+
+  .job-date {
+    color: #718096;
+    font-size: 0.9rem;
+  }
+
+  .applicants-count {
+    background: linear-gradient(135deg, #0F828C, #0A6B73);
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .applicants-count:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(15, 130, 140, 0.3);
+    color: white;
+    text-decoration: none;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  }
+
+  .empty-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 2rem;
+    background: linear-gradient(135deg, #E2E8F0, #CBD5E0);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: #718096;
+  }
+
+  .empty-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2D3748;
+    margin-bottom: 1rem;
+  }
+
+  .empty-subtitle {
+    color: #718096;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Recent Applications */
+  .applications-section {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  }
+
+  .application-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+  }
+
+  .application-item:hover {
+    background: rgba(15, 130, 140, 0.05);
+    border-color: rgba(15, 130, 140, 0.1);
+    transform: translateX(5px);
+  }
+
+  .applicant-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0F828C, #0A6B73);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    margin-right: 1rem;
+    flex-shrink: 0;
+  }
+
+  .applicant-info {
+    flex-grow: 1;
+  }
+
+  .applicant-name {
+    font-weight: 600;
+    color: #1A202C;
+    margin-bottom: 0.2rem;
+  }
+
+  .applicant-position {
+    color: #4A5568;
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .application-time {
+    color: #718096;
+    font-size: 0.8rem;
+  }
+
+  .application-status {
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .application-status.new {
+    background: rgba(56, 161, 105, 0.15);
+    color: #38A169;
+  }
+
+  .application-status.reviewed {
+    background: rgba(15, 130, 140, 0.15);
+    color: #0F828C;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .dashboard-header {
+      padding: 2rem 0;
+      margin: -2rem -15px 2rem -15px;
+    }
+
+    .welcome-title {
+      font-size: 2rem;
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .jobs-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .job-header {
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+
+    .job-meta {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: stretch;
+    }
+
+    .section-title {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: stretch;
+    }
+  }
+
+  /* Animation */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeInUp 0.6s ease-out;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+  <div class="container">
+    <div class="welcome-content text-center">
+      <div class="company-avatar">
+        <i class="bi bi-building"></i>
+      </div>
+      <h1 class="welcome-title">Welcome, {{ user.first_name|default:user.username }}!</h1>
+      <p class="welcome-subtitle">Manage your job postings and find the perfect candidates for your team.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="quick-actions animate-fade-in">
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="action-card">
+        <div class="action-icon" style="background: linear-gradient(135deg, #38A169, #2F855A);">
+          <i class="bi bi-plus-circle"></i>
+        </div>
+        <h3 class="action-title">Post New Job</h3>
+        <p class="action-description">Create a new job listing to attract qualified candidates to your company.</p>
+        <a href="{% url 'job_create' %}" class="action-btn btn-success">
+          <i class="bi bi-plus-lg"></i>
+          Create Job
+        </a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="action-card">
+        <div class="action-icon">
+          <i class="bi bi-people"></i>
+        </div>
+        <h3 class="action-title">Manage Applications</h3>
+        <p class="action-description">Review and manage applications from potential candidates across all your jobs.</p>
+        <a href="#" class="action-btn">
+          <i class="bi bi-arrow-right"></i>
+          View Applications
+        </a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="action-card">
+        <div class="action-icon">
+          <i class="bi bi-graph-up"></i>
+        </div>
+        <h3 class="action-title">Analytics</h3>
+        <p class="action-description">Track job performance, application rates, and recruitment metrics.</p>
+        <a href="#" class="action-btn">
+          <i class="bi bi-arrow-right"></i>
+          View Analytics
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Statistics Grid -->
+<div class="stats-grid animate-fade-in">
+  <div class="stat-card active-jobs">
+    <div class="stat-icon">
+      <i class="bi bi-briefcase"></i>
+    </div>
+    <span class="stat-number" data-target="{{ jobs|length }}">0</span>
+    <div class="stat-label">Active Jobs</div>
+  </div>
+  <div class="stat-card total-applicants">
+    <div class="stat-icon">
+      <i class="bi bi-person-check"></i>
+    </div>
+    <span class="stat-number" data-target="47">0</span>
+    <div class="stat-label">Total Applicants</div>
+  </div>
+  <div class="stat-card interviews">
+    <div class="stat-icon">
+      <i class="bi bi-camera-video"></i>
+    </div>
+    <span class="stat-number" data-target="12">0</span>
+    <div class="stat-label">Interviews Scheduled</div>
+  </div>
+  <div class="stat-card hired">
+    <div class="stat-icon">
+      <i class="bi bi-trophy"></i>
+    </div>
+    <span class="stat-number" data-target="8">0</span>
+    <div class="stat-label">Successful Hires</div>
+  </div>
+</div>
+
+<!-- Jobs Management -->
+<div class="jobs-section animate-fade-in">
+  <div class="section-title">
+    <div class="section-title-left">
+      <i class="bi bi-briefcase-fill"></i>
+      Your Job Listings
+    </div>
+    <a href="{% url 'job_create' %}" class="btn btn-sm action-btn btn-success">
+      <i class="bi bi-plus-lg"></i>
+      New Job
+    </a>
+  </div>
+  
+  {% if jobs %}
+  <div class="jobs-grid">
+    {% for job in jobs %}
+    <div class="job-card">
+      <div class="job-header">
+        <div class="flex-grow-1">
+          <a href="{% url 'job_detail' job.pk %}" class="job-title">{{ job.title }}</a>
+          <div class="job-company">{{ job.company_name }}</div>
+        </div>
+        <div class="job-status active">Active</div>
+      </div>
+      
+      <div class="job-meta">
+        <div class="job-date">
+          <i class="bi bi-calendar3 me-1"></i>
+          Posted {{ job.created_at|timesince }} ago
+        </div>
+        <a href="{% url 'job_applicants' job.pk %}" class="applicants-count">
+          <i class="bi bi-people"></i>
+          {{ job.applications.count }} applicant{{ job.applications.count|pluralize }}
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">
+      <i class="bi bi-briefcase"></i>
+    </div>
+    <h3 class="empty-title">No Job Listings Yet</h3>
+    <p class="empty-subtitle">Start building your team by posting your first job listing. It only takes a few minutes!</p>
+    <a href="{% url 'job_create' %}" class="btn action-btn btn-success">
+      <i class="bi bi-plus-circle me-2"></i>Post Your First Job
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Recent Applications -->
+<div class="applications-section animate-fade-in">
+  <h2 class="section-title">
+    <div class="section-title-left">
+      <i class="bi bi-person-lines-fill"></i>
+      Recent Applications
+    </div>
+  </h2>
+  
+  <div class="application-item">
+    <div class="applicant-avatar">JD</div>
+    <div class="applicant-info">
+      <div class="applicant-name">John Doe</div>
+      <div class="applicant-position">Applied for Software Engineer</div>
+      <div class="application-time">2 hours ago</div>
+    </div>
+    <div class="application-status new">New</div>
+  </div>
+  
+  <div class="application-item">
+    <div class="applicant-avatar">SM</div>
+    <div class="applicant-info">
+      <div class="applicant-name">Sarah Miller</div>
+      <div class="applicant-position">Applied for UX Designer</div>
+      <div class="application-time">5 hours ago</div>
+    </div>
+    <div class="application-status reviewed">Reviewed</div>
+  </div>
+  
+  <div class="application-item">
+    <div class="applicant-avatar">MJ</div>
+    <div class="applicant-info">
+      <div class="applicant-name">Mike Johnson</div>
+      <div class="applicant-position">Applied for Product Manager</div>
+      <div class="application-time">1 day ago</div>
+    </div>
+    <div class="application-status new">New</div>
+  </div>
+  
+  <div class="application-item">
+    <div class="applicant-avatar">LB</div>
+    <div class="applicant-info">
+      <div class="applicant-name">Lisa Brown</div>
+      <div class="applicant-position">Applied for Marketing Specialist</div>
+      <div class="application-time">2 days ago</div>
+    </div>
+    <div class="application-status reviewed">Reviewed</div>
+  </div>
+</div>
+
+<script>
+// Animated Counters
+function animateCounters() {
+  const counters = document.querySelectorAll('.stat-number');
+  const speed = 100;
+
+  counters.forEach(counter => {
+    const target = parseInt(counter.getAttribute('data-target'));
+    let current = 0;
+    const increment = target / speed;
+
+    const updateCounter = () => {
+      if (current < target) {
+        current += increment;
+        counter.textContent = Math.ceil(current);
+        setTimeout(updateCounter, 20);
+      } else {
+        counter.textContent = target;
+      }
+    };
+    updateCounter();
+  });
+}
+
+// Intersection Observer for Stats Animation
+const statsGrid = document.querySelector('.stats-grid');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      animateCounters();
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.5 });
+
+if (statsGrid) {
+  observer.observe(statsGrid);
+}
+
+// Add entrance animations with delay
+document.addEventListener('DOMContentLoaded', function() {
+  const animatedElements = document.querySelectorAll('.animate-fade-in');
+  
+  animatedElements.forEach((element, index) => {
+    element.style.opacity = '0';
+    element.style.transform = 'translateY(30px)';
+    
+    setTimeout(() => {
+      element.style.transition = 'all 0.6s ease';
+      element.style.opacity = '1';
+      element.style.transform = 'translateY(0)';
+    }, index * 200);
+  });
+  
+  // Add loading states to action buttons
+  document.querySelectorAll('.action-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      if (!this.classList.contains('loading')) {
+        this.classList.add('loading');
+        const originalText = this.innerHTML;
+        this.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Loading...';
+        this.style.pointerEvents = 'none';
+        
+        setTimeout(() => {
+          this.classList.remove('loading');
+          this.innerHTML = originalText;
+          this.style.pointerEvents = 'auto';
+        }, 1500);
+      }
+    });
+  });
+  
+  // Add hover effects to application items
+  document.querySelectorAll('.application-item').forEach(item => {
+    item.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateX(5px)';
+    });
+    
+    item.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateX(0)';
+    });
+  });
+});
+
+// Add dynamic greeting based on time
+function updateGreeting() {
+  const hour = new Date().getHours();
+  const welcomeTitle = document.querySelector('.welcome-title');
+  const username = '{{ user.first_name|default:user.username }}';
+  
+  let greeting = 'Good evening';
+  if (hour < 12) greeting = 'Good morning';
+  else if (hour < 18) greeting = 'Good afternoon';
+  
+  if (welcomeTitle) {
+    welcomeTitle.textContent = `${greeting}, ${username}!`;
+  }
+}
+
+updateGreeting();
+
+// Job status management
+document.querySelectorAll('.job-status').forEach(status => {
+  const jobCard = status.closest('.job-card');
+  if (status.textContent.toLowerCase() === 'active') {
+    status.classList.add('active');
+  } else if (status.textContent.toLowerCase() === 'draft') {
+    status.classList.add('draft');
+  } else if (status.textContent.toLowerCase() === 'closed') {
+    status.classList.add('closed');
+  }
+});
+
+// Real-time updates simulation
+setInterval(() => {
+  // In a real application, you would fetch new data here
+  const applicationItems = document.querySelectorAll('.application-time');
+  // Update timestamps or add new applications
+}, 60000);
+</script>
+{% endblock %}

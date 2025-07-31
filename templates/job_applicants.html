@@ -52,6 +52,28 @@
     max-height: 100px;
     overflow-y: auto;
   }
+
+  .badge-status {
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .status-pending {
+    background-color: #adb5bd;
+    color: white;
+  }
+
+  .status-approved {
+    background-color: #198754;
+    color: white;
+  }
+
+  .status-rejected {
+    background-color: #dc3545;
+    color: white;
+  }
 </style>
 
 <div class="container">
@@ -94,17 +116,15 @@
               <a href="{{ app.resume.url }}" target="_blank" class="btn btn-custom btn-sm w-100 p-2 mt-3">
                 <i class="bi bi-file-earmark-arrow-down me-1"></i>Download Resume
               </a>
-            </div>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div class="alert alert-info d-flex align-items-center mt-3" role="alert">
-      <i class="bi bi-info-circle-fill me-2"></i>
-      <div>No applicants yet for this job.</div>
-    </div>
-  {% endif %}
-</div>
 
-{% endblock %}
+              <div class="mt-3 d-flex justify-content-between align-items-center">
+                <span class="badge-status 
+                  {% if app.status == 'APPROVED' %}status-approved
+                  {% elif app.status == 'REJECTED' %}status-rejected
+                  {% else %}status-pending{% endif %}">
+                  {{ app.get_status_display }}
+                </span>
+              </div>
+
+              {% if app.status == "PENDING" %}
+                <form method

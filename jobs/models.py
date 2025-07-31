@@ -26,11 +26,18 @@ class Job(models.Model):
 
 
 class Application(models.Model):
+    STATUS_CHOICES = (
+        ('PENDING', 'Pending'),
+        ('APPROVED', 'Approved'),
+        ('REJECTED', 'Rejected'),
+    )
+
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="applications")
     applicant = models.ForeignKey(User, on_delete=models.CASCADE, related_name="applications")
     resume = models.FileField(upload_to="resumes/")
     cover_letter = models.TextField()
     applied_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
 
     def __str__(self):
-        return f"{self.applicant.username} -> {self.job.title}"
+        return f"{self.applicant.username} -> {self.job.title} ({self.status})"

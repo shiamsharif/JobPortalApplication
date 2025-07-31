@@ -86,9 +86,21 @@ def job_create(request):
 def job_applicants(request, pk):
     if request.user.profile.role != "EMPLOYER":
         return redirect("home")
+
     job = get_object_or_404(Job, pk=pk, posted_by=request.user)
+
+    if request.method == "POST":
+        app_id = request.POST.get("application_id")
+        new_status = request.POST.get("status")
+        application = get_object_or_404(Application, pk=app_id, job=job)
+        if new_status in ["APPROVED", "REJECTED"]:
+            application.status = new_status
+            application.save()
+            messages.success(request, f"Application {new_status.lower()}.")
+
     applicants = job.applications.select_related("applicant").order_by("-applied_at")
     return render(request, "job_applicants.html", {"job": job, "applicants": applicants})
+
 
 # --- Applicant: list, detail, apply, my applications ---
 
@@ -144,5 +156,10 @@ def apply_job(request, pk):
 def my_applications(request):
     if request.user.profile.role != "APPLICANT":
         return redirect("home")
+    
+    status_filter = request.GET.get("status")
     apps = Application.objects.filter(applicant=request.user).select_related("job").order_by("-applied_at")
-    return render(request, "my_applications.html", {"applications": apps})
+    if status_filter in ["PENDING", "APPROVED", "REJECTED"]:
+        apps = apps.filter(status=status_filter)
+
+    return render(request, "my_applications.html", {"applications": apps, "status_filter": status_filter})
